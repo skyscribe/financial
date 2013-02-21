@@ -1,10 +1,10 @@
-gen: mainForm.py
+gen: mainForm.py modify.py
 	@echo "done"
 
-mainForm.py : mainForm.ui
+%.py : %.ui
 	pyuic4 $^ > $@
 
-run: mainForm.py main.py
+run: mainForm.py main.py modify.py
 	python main.py
 
 .phony:gen run

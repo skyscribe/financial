@@ -1,57 +1,57 @@
 [
     {
-        "id" : 1,
-        "contents" : {
-            "type" : "A类",
-            "date" : "2013-02-20",
-            "name" : "张三",
-            "pic"  : "pictures/image1.jpg",
-            "price" : "122",
-            "comments" : "无"
+        "id": 1, 
+        "contents": {
+            "name": "\u5f20\u4e09", 
+            "price": "122", 
+            "pic": "pictures/image1.jpg", 
+            "comments": "\u65e0", 
+            "date": "2013-02-20", 
+            "type": "A\u7c7b"
         }
-    },
+    }, 
     {
-        "id" : 2,
-        "contents" : {
-            "type" : "B类",
-            "date" : "2013-02-10",
-            "name" : "张三",
-            "pic"  : "pictures/image2.jpg",
-            "price" : "112",
-            "comments" : "无"
+        "id": 2, 
+        "contents": {
+            "name": "\u5f20\u4e09", 
+            "price": "112", 
+            "pic": "pictures/image2.jpg", 
+            "comments": "\u65e0", 
+            "date": "2013-02-10", 
+            "type": "B\u7c7b"
         }
-    },
+    }, 
     {
-        "id" : 3,
-        "contents" : {
-            "type" : "C类",
-            "date" : "2013-02-12",
-            "name" : "李四",
-            "pic"  : "pictures/image3.jpg",
-            "price" : "212",
-            "comments" : "无"
+        "id": 3, 
+        "contents": {
+            "name": "\u674e\u56db", 
+            "price": "212", 
+            "pic": "pictures/image3.jpg", 
+            "comments": "\u65e0", 
+            "date": "2013-02-12", 
+            "type": "C\u7c7b"
         }
-    },
+    }, 
     {
-        "id" : 4,
-        "contents" : {
-            "type" : "B类",
-            "date" : "2013-03-12",
-            "name" : "王五",
-            "pic"  : "pictures/image4.jpg",
-            "price" : "272",
-            "comments" : "无"
+        "id": 4, 
+        "contents": {
+            "name": "\u738b\u4e94", 
+            "price": "272", 
+            "pic": "pictures/image4.jpg", 
+            "comments": "\u65e0", 
+            "date": "2013-03-12", 
+            "type": "B\u7c7b"
         }
-    },
+    }, 
     {
-        "id" : 5,
-        "contents" : {
-            "type" : "C类",
-            "date" : "2013-02-12",
-            "name" : "李一",
-            "pic"  : "pictures/image5.jpg",
-            "price" : "212",
-            "comments" : "无"
+        "id": 5, 
+        "contents": {
+            "name": "\u674e\u4e00", 
+            "price": "212", 
+            "pic": "pictures/image5.jpg", 
+            "comments": "\u65e0", 
+            "date": "2013-02-12", 
+            "type": "C\u7c7b"
         }
     }
 ]

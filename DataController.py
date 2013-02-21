@@ -25,13 +25,13 @@ class DetailedDataModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent, *args) 
         self.dataFile = "data.json"
         self._jsonData = json.load(codecs.getreader('utf-8')(open(self.dataFile)))
-        self.header = [u'标记', u'名字', u'分类', u'价格', u'备注', u'图片']
+        self.header = [u'标记', u'名字', u'分类', u'价格', u'时间', u'备注', u'图片']
 
         dataArray = []
         for data in self._jsonData:
             id, info = data['id'], data['contents']
             dataArray.append([id, info['name'], info['type'], info['price'], 
-                info['comments'], info['pic'] ])
+                info['date'], info['comments'], info['pic'] ])
         self.dataArray = dataArray
 
     def rowCount(self, parent): 
@@ -39,6 +39,9 @@ class DetailedDataModel(QAbstractTableModel):
 
     def columnCount(self, parent): 
         return len(self.dataArray[0]) 
+
+    def getPicRowIndex(self):
+        return len(self.header) - 1
 
     def data(self, index, role = Qt.DisplayRole): 
         if not index.isValid(): 
@@ -60,4 +63,23 @@ class DetailedDataModel(QAbstractTableModel):
         if order == Qt.DescendingOrder:
             self.dataArray.reverse()
         self.emit(SIGNAL("layoutChanged()"))
+
+    def saveData(self):
+        '''Save data to json file'''
+        print "saving data..."
+        jsonArray = []
+        for record in self.dataArray:
+            id, name, type, price, date, comments, pic = record
+            jsonArray.append({
+                    'id' : id,
+                    'contents' : {
+                        'type'     : type,
+                        'date'     : date,
+                        'name'     : name,
+                        'pic'      : pic,
+                        'price'    : price,
+                        'comments' : comments
+                    }})
+        json.dump(jsonArray, codecs.getwriter('utf-8')(open(self.dataFile, "w")),
+                indent = 4)
 
