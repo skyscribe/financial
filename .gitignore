@@ -32,4 +32,7 @@ nosetests.xml
 # Mr Developer
 .mr.developer.cfg
 .project
+
+# vim backup
+*.swp
 .pydevproject
