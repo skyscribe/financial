@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'modify.ui'
 #
-# Created: Thu Feb 21 17:09:04 2013
+# Created: Thu Feb 21 22:18:50 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -90,6 +90,7 @@ class Ui_EditDlg(object):
         self.editTime.setGeometry(QtCore.QRect(130, 240, 261, 31))
         self.editTime.setReadOnly(True)
         self.editTime.setDateTime(QtCore.QDateTime(QtCore.QDate(2000, 1, 1), QtCore.QTime(0, 0, 0)))
+        self.editTime.setDisplayFormat(_fromUtf8("yyyy-MM-dd hh:mm:ss"))
         self.editTime.setObjectName(_fromUtf8("editTime"))
         self.btnOk = QtGui.QPushButton(EditDlg)
         self.btnOk.setGeometry(QtCore.QRect(20, 290, 151, 31))
@@ -130,7 +131,6 @@ class Ui_EditDlg(object):
         self.label_4.setText(QtGui.QApplication.translate("EditDlg", "价格", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("EditDlg", "图片", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("EditDlg", "时间", None, QtGui.QApplication.UnicodeUTF8))
-        self.editTime.setDisplayFormat(QtGui.QApplication.translate("EditDlg", "yyyy-MM-dd APh:mm", None, QtGui.QApplication.UnicodeUTF8))
         self.btnOk.setText(QtGui.QApplication.translate("EditDlg", "确定", None, QtGui.QApplication.UnicodeUTF8))
         self.btnExit.setText(QtGui.QApplication.translate("EditDlg", "取消", None, QtGui.QApplication.UnicodeUTF8))
         self.label_7.setText(QtGui.QApplication.translate("EditDlg", "备注", None, QtGui.QApplication.UnicodeUTF8))

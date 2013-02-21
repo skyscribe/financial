@@ -43,6 +43,7 @@ class MainApp(QMainWindow):
         self.ui.listData.clicked.connect(self._showCurrentPicture)
         self.ui.btnAdd.clicked.connect(self._addRecord)
         self.ui.btnModify.clicked.connect(self._modifyRecord)
+        self.ui.listData.doubleClicked.connect(self._modifyRecord)
 
     def _showDataInList(self):
         ''' Show the data in list by mode'''

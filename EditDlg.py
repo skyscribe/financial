@@ -15,6 +15,7 @@ class EditDlg(QDialog):
         self.ui = Ui_EditDlg()
         self.ui.setupUi(self)
         self.listData = parent.ui.listData
+        self.mode = mode
 
         self.ui.btnChooser.clicked.connect(self._chooseFile)
         
@@ -41,12 +42,33 @@ class EditDlg(QDialog):
         self.ui.editName.setText(fetchValue(1))
         self.ui.editType.setText(fetchValue(2))
         self.ui.editPrice.setText(fetchValue(3))
-        self.ui.editTime.setDateTime(QDateTime.currentDateTime())
+        dt = QDateTime.fromString(fetchValue(4), "yyyy-MM-dd HH:mm:ss")
+        if not dt.isValid():
+            dt = QDateTime.currentDateTime()
+        self.ui.editTime.setDateTime(dt)
         self.ui.editComments.setText(fetchValue(5))
         self.ui.editPic.setText(fetchValue(6))
  
     def accept(self):
-        print "accepted!"
+        model = self.listData.model()
+        if self.mode == 'add':
+            model.insertRow(model.rowCount(None))
+            row = model.rowCount(None) - 1
+        else:
+            self.ui.editTime.setDateTime(QDateTime.currentDateTime())
+            row = self.listData.selectedIndexes()[0].row()
+
+        itemData = [ 
+            self.ui.editID.toPlainText(),
+            self.ui.editName.toPlainText(),
+            self.ui.editType.toPlainText(),
+            self.ui.editPrice.toPlainText(),
+            self.ui.editTime.dateTime().toString("yyyy-MM-dd HH:mm:ss"),
+            self.ui.editComments.toPlainText(),
+            self.ui.editPic.toPlainText(),
+        ]
+        model.updateWholeRow(row, itemData)
+        
 
     def reject(self):
         print "rejected!"

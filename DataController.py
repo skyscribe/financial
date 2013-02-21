@@ -34,6 +34,8 @@ class DetailedDataModel(QAbstractTableModel):
                 info['date'], info['comments'], info['pic'] ])
         self.dataArray = dataArray
 
+        self.defaultData = [1, u'name', u'type', u'price', u'time', u'comments', u'pics']
+
     def rowCount(self, parent): 
         return len(self.dataArray) 
 
@@ -54,6 +56,29 @@ class DetailedDataModel(QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return QVariant(self.header[col])
         return QVariant()
+
+    def updateWholeRow(self, row, itemData):
+        '''Update whole role using given itemData'''
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        for value in itemData:
+            col = itemData.index(value)
+            self.dataArray[row][col] = unicode(value)
+        self.emit(SIGNAL("layoutChanged()"))
+        self.saveData()
+
+    def insertRows(self, row, cnt, parent):
+        self.beginInsertRows(parent, row, row + cnt - 1)
+        for i in range(0, cnt):
+            self.dataArray.insert(row, self.defaultData)
+        self.endInsertRows()
+        return True
+
+    def removeRows(self, row, cnt, parent):
+        self.beginRemoveRows(parent, row, row + cnt - 1)
+        for i in range(0, cnt):
+            self.dataArray.pop(row + i)
+        self.endRemoveRows()
+        return True
 
     def sort(self, Ncol, order):
         """Sort table by given column number.

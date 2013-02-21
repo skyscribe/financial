@@ -269,7 +269,7 @@
     </datetime>
    </property>
    <property name="displayFormat">
-    <string>yyyy-MM-dd APh:mm</string>
+    <string notr="true">yyyy-MM-dd hh:mm:ss</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btnOk">
