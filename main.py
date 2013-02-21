@@ -6,7 +6,7 @@ from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QWidget
 from PyQt4.QtGui import QMainWindow
 
-from DataController import MyTableModel
+from DataController import createDataModel
 import sys
 
 ###############################################################################
@@ -22,7 +22,6 @@ class MainApp(QMainWindow):
         "totalOut" : u'总帐目 - 进货',
         "personal" : u'个人帐', 
         }
-        self.dataFile = "data.json"
 
         self._initData()
         self._bindSignals()
@@ -33,33 +32,15 @@ class MainApp(QMainWindow):
         names = [v for (k,v) in self.modes.items()]
         names.sort()
         self.ui.modeSelector.addItems(names)     
-        self._loadJsonData()
-
-    def _loadJsonData(self):
-        import json
-        import codecs
-        self._jsonData = json.load(codecs.getreader('utf-8')(open('data.json')))
 
     def _bindSignals(self):
         self.ui.listData.clicked.connect(self._showCurrentPicture)
 
     def _showDataInList(self):
         ''' Show the data in list by mode'''
-        mode = self._getSelectedMode()
-        if mode == 'personal':
-            self._showDataInDetailedMode()
-
-    def _showDataInDetailedMode(self):
-        header = [u'标记', u'名字', u'分类', u'价格', u'备注', u'图片']
-        dataForList = []
-        for data in self._jsonData:
-            id, info = data['id'], data['contents']
-            dataForList.append([id, info['name'], info['type'], info['price'], 
-                info['comments'], info['pic'] ])
-
-        listData = self.ui.listData
-        model = MyTableModel(dataForList, header)
-        listData.setModel(model)
+        self._mode = self._getSelectedMode()
+        model = createDataModel(self._getSelectedMode())
+        self.ui.listData.setModel(model)
         #[listData.setColumnWidth(i, listData.columnWidth(i)*2) for i in range(len(header)-2, len(header)) ]
 
     def _getSelectedMode(self):
