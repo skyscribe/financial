@@ -4,6 +4,8 @@
 from DataController import createDataModel
 
 from PyQt4.QtCore import Qt
+from PyQt4.QtCore import SIGNAL
+from PyQt4.QtCore import QObject
 from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QMainWindow
 from PyQt4.QtGui import QPixmap
@@ -52,6 +54,9 @@ class MainApp(QMainWindow):
         model = createDataModel(self._getSelectedMode())
         self.ui.listData.setModel(model)
         #[listData.setColumnWidth(i, listData.columnWidth(i)*2) for i in range(len(header)-2, len(header)) ]
+        selModel = self.ui.listData.selectionModel()
+        selModel.selectionChanged.connect(self._selectionChanged)
+        print "bind selection on model:", selModel
 
     def _getSelectedMode(self):
         selectedText = unicode(self.ui.modeSelector.currentText())
@@ -100,6 +105,21 @@ class MainApp(QMainWindow):
         row = selected.row()
         model = self.ui.listData.model()
         model.removeRow(row)
+
+    def _selectionChanged(self, selected, deselected):
+        getRow = lambda sel : len(sel.indexes()) != 0 and sel.indexes()[0].row or (-1)
+        newSelRow = getRow(selected)
+        oldSelRow = getRow(deselected)
+        if newSelRow != -1:
+            #enable del/modify, disable new
+            self.ui.btnAdd.setDisabled(True)
+            self.ui.btnModify.setEnabled(True)
+            self.ui.btnDel.setEnabled(True)
+        else:
+            #enable new, disable del/modify
+            self.ui.btnAdd.setEnabled(True)
+            self.ui.btnModify.setDisabled(True)
+            self.ui.btnDel.setDisabled(True)
 
 
 
