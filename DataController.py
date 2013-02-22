@@ -64,7 +64,8 @@ class DetailedDataModel(QAbstractTableModel):
             col = itemData.index(value)
             self.dataArray[row][col] = unicode(value)
         self.emit(SIGNAL("layoutChanged()"))
-        self.saveData()
+        #Data would be saved upon exit
+        #self.saveData()
 
     def insertRows(self, row, cnt, parent):
         self.beginInsertRows(parent, row, row + cnt - 1)
