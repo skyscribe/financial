@@ -43,6 +43,7 @@ class MainApp(QMainWindow):
         self.ui.listData.clicked.connect(self._showCurrentPicture)
         self.ui.btnAdd.clicked.connect(self._addRecord)
         self.ui.btnModify.clicked.connect(self._modifyRecord)
+        self.ui.btnDel.clicked.connect(self._delRecord)
         self.ui.listData.doubleClicked.connect(self._modifyRecord)
 
     def _showDataInList(self):
@@ -82,7 +83,7 @@ class MainApp(QMainWindow):
         self.ui.btnModify.setEnabled(True)
         self.ui.btnDel.setEnabled(True)
 
-    def _saveAndFlushData(self):
+    def saveAndFlushData(self):
         ''' Save and flush the list data '''
         self.ui.listData.model().saveData()
 
@@ -94,11 +95,19 @@ class MainApp(QMainWindow):
         dlg = EditDlg(self, 'add')
         ret = dlg.exec_()
 
+    def _delRecord(self):
+        selected = self.ui.listData.selectedIndexes()[0]
+        row = selected.row()
+        model = self.ui.listData.model()
+        model.removeRow(row)
+
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     myapp = MainApp()
     myapp.show()
-    sys.exit(app.exec_())
+    ret = app.exec_()
+    myapp.saveAndFlushData()
+    sys.exit(ret)
 
