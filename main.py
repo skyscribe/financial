@@ -56,9 +56,9 @@ class MainApp(QMainWindow):
 
         self.statusBar().setStyleSheet('background:#33FF99')
         if model.rowCount(None) > 0:
-            self._setStatusMsg(u'选择一行或多行修改/删除数据')
+            self.setStatusMsg(u'选择一行或多行修改/删除数据')
         else:
-            self._setStatusMsg(u'还没有数据，请点击增加新记录添加数据')
+            self.setStatusMsg(u'还没有数据，请点击增加新记录添加数据')
 
     def _getSelectedMode(self):
         selectedText = unicode(self.ui.modeSelector.currentText())
@@ -84,7 +84,7 @@ class MainApp(QMainWindow):
         data = self.ui.listData
         rows = [selected.row() for selected in data.selectionModel().selectedRows()]
         result = [str(row) for row in rows if data.model().removeRow(row)]
-        self._setStatusMsg(u"成功删除了%d行数据，行号:%s"%(len(result), ','.join(result)), 2000)
+        self.setStatusMsg(u"成功删除了%d行数据，行号:%s"%(len(result), ','.join(result)), 2000)
             
 
     def _selectionChanged(self, selected, deselected):
@@ -96,7 +96,7 @@ class MainApp(QMainWindow):
             rows = [selected.row() for selected in data.selectionModel().selectedRows()]
             rows.sort()
             rows = [str(id) for id in rows]
-            self._setStatusMsg(u"选择了如下行:%s"%(','.join(rows)), 2000)
+            self.setStatusMsg(u"选择了如下行:%s"%(','.join(rows)), 2000)
             #enable del/modify, disable new
             self.ui.btnAdd.setDisabled(True)
             self.ui.btnModify.setEnabled(len(rows) == 1)
@@ -126,7 +126,7 @@ class MainApp(QMainWindow):
             pixmap.scaled(rect.width(), rect.height(), Qt.KeepAspectRatioByExpanding)
             self.ui.pictureShow.setPixmap(pixmap)
 
-    def _setStatusMsg(self, msg, timeout = 0):
+    def setStatusMsg(self, msg, timeout = 0):
         ''' set status hints'''
         self.statusBar().showMessage(msg, timeout)
 

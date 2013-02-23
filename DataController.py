@@ -7,7 +7,6 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtCore import SIGNAL
 import operator
 import json
-import sys
 import codecs
 
 def createDataModel(mode):
@@ -26,17 +25,20 @@ class DetailedDataModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent, *args) 
         self.dataFile = "data.json"
         self._jsonData = json.load(codecs.getreader('utf-8')(open(self.dataFile)))
-        self.header = [u'标记', u'名字', u'分类', u'价格', u'时间', u'备注', u'图片']
-        self.headerLiteral = ['ID', 'Name', 'Type', 'Price', 'Time', 'Comments', 'Pic']
+        self.header = [u'标记', u'名字', u'分类', u'进/出货', u'价格', u'时间', u'备注', u'图片']
+        self.headerLiteral = ['ID', 'Name', 'Type', 'Category', 'Price', 'Time', 'Comments', 'Pic']
 
         dataArray = []
         for data in self._jsonData:
             id, info = data['id'], data['contents']
-            dataArray.append([id, info['name'], info['type'], info['price'], 
+            dataArray.append([id, info['name'], info['type'], info['category'], info['price'], 
                 info['date'], info['comments'], info['pic'] ])
         self.dataArray = dataArray
 
-        self.defaultData = [1, u'name', u'type', u'price', u'time', u'comments', u'pics']
+        self.defaultData = [1, u'name', u'type', u'cat', u'price', u'time', u'comments', u'pics']
+
+    def getColIndexByName(self, name):
+        return self.headerLiteral.index(name)
 
     def getColTagByName(self, name):
         return self.header[self.headerLiteral.index(name)]
@@ -84,8 +86,6 @@ class DetailedDataModel(QAbstractTableModel):
         self.beginInsertRows(parent, row, row + cnt - 1)
         #self.dumpData(sys.stdout, "###### Before insert, rows:")
         for i in range(0, cnt):
-            print "Inserting row %d, total rows:%d"%(row, len(self.dataArray))
-            print "default:", self.defaultData
             if row < len(self.dataArray):
                 self.dataArray.insert(row, list(self.defaultData))
             else:
@@ -110,7 +110,7 @@ class DetailedDataModel(QAbstractTableModel):
         """
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
         cmpFunc = None
-        if Ncol == 0 or Ncol == 3:
+        if Ncol == self.headerLiteral.index('ID') or Ncol == self.headerLiteral.index('Price'):
             cmpFunc = lambda l,r: (int(l) - int(r))
         self.dataArray = sorted(self.dataArray, key=operator.itemgetter(Ncol), cmp = cmpFunc)        
         if order == Qt.DescendingOrder:
@@ -122,11 +122,12 @@ class DetailedDataModel(QAbstractTableModel):
         print "saving data..."
         jsonArray = []
         for record in self.dataArray:
-            id, name, type, price, date, comments, pic = record
+            id, name, type, category, price, date, comments, pic = record
             jsonArray.append({
                     'id' : id,
                     'contents' : {
                         'type'     : type,
+                        'category' : category,
                         'date'     : date,
                         'name'     : name,
                         'pic'      : pic,

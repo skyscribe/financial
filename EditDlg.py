@@ -15,25 +15,34 @@ class EditDlg(QDialog):
         self.ui = Ui_EditDlg()
         self.ui.setupUi(self)
         self.listData = parent.ui.listData
+        self.setStatusMsg = parent.setStatusMsg
         self.mode = mode
         self._hasUpdates = False
 
+        self.categories = [u'进货', u'出货']
+        self.ui.comboCategory.addItems(self.categories)
+        self.ui.comboCategory.setCurrentIndex(0);
         self.ui.btnChooser.clicked.connect(self._chooseFile)
-        for ctrl in ['editName', 'editType', 'editPrice', 'editPic']:
-            getattr(self.ui, ctrl).textChanged.connect(self._dataChanged)
-        
+
         if mode == 'add':
             self._prepForAdd()
         else:
             self._prepForModify()
 
+        #Listen for changes after preparation
+        for ctrl in ['editName', 'editType', 'editPrice', 'editPic', 'editComments']:
+            getattr(self.ui, ctrl).textChanged.connect(self._dataChanged)
+        self.ui.comboCategory.currentIndexChanged.connect(self._dataChanged)
+
     def _dataChanged(self):
+        print "data changed!"
         self._hasUpdates = True
 
     def _prepForAdd(self):
         model = self.listData.model()
         #Load id
         self.ui.editID.setText(str(model.getNewUnusedId()))
+        self.ui.comboCategory.setCurrentIndex(0)
         #Set current time
         self.ui.editTime.setDateTime(QDateTime.currentDateTime())
 
@@ -41,20 +50,29 @@ class EditDlg(QDialog):
         model = self.listData.model()
         selected = self.listData.selectedIndexes()[0]
         row = selected.row()
-        fetchValue = lambda col: model.data(model.createIndex(row, col)).toString()
-        self.ui.editID.setText(fetchValue(0))
-        self.ui.editName.setText(fetchValue(1))
-        self.ui.editType.setText(fetchValue(2))
-        self.ui.editPrice.setText(fetchValue(3))
-        dt = QDateTime.fromString(fetchValue(4), "yyyy-MM-dd HH:mm:ss")
+        fetchByColId = lambda col: model.data(model.createIndex(row, col)).toString()
+        fetchColId = lambda name: model.getColIndexByName(name)
+        fetchValue = lambda name: fetchByColId(fetchColId(name))
+        self.ui.editID.setText(fetchValue('ID'))
+        self.ui.editName.setText(fetchValue('Name'))
+        self.ui.editType.setText(fetchValue('Type'))
+        self.ui.editPrice.setText(fetchValue('Price'))
+        dt = QDateTime.fromString(fetchValue('Time'), "yyyy-MM-dd HH:mm:ss")
         if not dt.isValid():
             dt = QDateTime.currentDateTime()
         self.ui.editTime.setDateTime(dt)
-        self.ui.editComments.setText(fetchValue(5))
-        self.ui.editPic.setText(fetchValue(6))
+        self.ui.editComments.setText(fetchValue('Comments'))
+        self.ui.editPic.setText(fetchValue('Pic'))
+
+        catMatches = [k for k in self.categories if fetchValue('Category') == k]
+        if len(catMatches) == 0:
+            self.ui.comboCategory.setCurrentIndex(0)
+        else:
+            self.ui.comboCategory.setCurrentIndex(self.categories.index(catMatches[0]))
  
     def accept(self):
         '''Accept the changes'''
+        self.setStatusMsg(u'添加/修改无变化，已自动撤销', 3000)
         if not self._hasUpdates:
             return True
 
@@ -62,20 +80,23 @@ class EditDlg(QDialog):
         if self.mode == 'add':
             model.insertRow(model.rowCount(None))
             row = model.rowCount(None) - 1
+            self.setStatusMsg(u'添加新交易已经成功，目前总共 %d 条记录'%(row + 1))
         else:
             self.ui.editTime.setDateTime(QDateTime.currentDateTime())
             row = self.listData.selectedIndexes()[0].row()
+            self.setStatusMsg(u'修改记录已经成功', 3000)
 
         getEditText = lambda name: getattr(self.ui, name).toPlainText()
         getColTag = lambda tagName : model.getColTagByName(tagName)
-        itemData = { 
-                getColTag('ID') : getEditText('editID'),
-                getColTag('Name') : getEditText('editName'),
-                getColTag('Type') : getEditText('editType'),
-                getColTag('Price') : getEditText('editPrice'),
-                getColTag('Time') : self.ui.editTime.dateTime().toString("yyyy-MM-dd HH:mm:ss"),
-                getColTag('Comments') : getEditText('editComments'),
-                getColTag('Pic') : getEditText('editPic'),
+        itemData = {
+            getColTag('ID')       : getEditText('editID'),
+            getColTag('Name')     : getEditText('editName'),
+            getColTag('Type')     : getEditText('editType'),
+            getColTag('Price')    : getEditText('editPrice'),
+            getColTag('Time')     : self.ui.editTime.dateTime().toString("yyyy-MM-dd HH : mm : ss"),
+            getColTag('Comments') : getEditText('editComments'),
+            getColTag('Pic')      : getEditText('editPic'),
+            getColTag('Category') : self.ui.comboCategory.currentText(), 
             }
         model.updateWholeRow(row, itemData)
         return True
