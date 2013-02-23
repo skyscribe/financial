@@ -4,8 +4,6 @@
 from DataController import createDataModel
 
 from PyQt4.QtCore import Qt
-from PyQt4.QtCore import SIGNAL
-from PyQt4.QtCore import QObject
 from PyQt4.QtGui import QApplication
 from PyQt4.QtGui import QMainWindow
 from PyQt4.QtGui import QPixmap
@@ -24,14 +22,14 @@ class MainApp(QMainWindow):
 
         #Constant infoG
         self.modes = {
-        "totalIn" : u'总帐目-出货',
-        "totalOut" : u'总帐目 - 进货',
-        "personal" : u'个人帐', 
+            "totalIn" : u'总帐目-出货',
+            "totalOut" : u'总帐目 - 进货',
+            "personal" : u'个人帐', 
         }
 
         self._initData()
         self._bindSignals()
-        self._showDataInList()
+        self._setInitialShow()
 
     def _initData(self):
         '''Initialize the data'''
@@ -48,14 +46,19 @@ class MainApp(QMainWindow):
         self.ui.btnDel.clicked.connect(self._delRecords)
         self.ui.listData.doubleClicked.connect(self._modifyRecord)
 
-    def _showDataInList(self):
-        ''' Show the data in list by mode'''
+    def _setInitialShow(self):
+        ''' Set initial data show and styles'''
         self._mode = self._getSelectedMode()
         model = createDataModel(self._getSelectedMode())
         self.ui.listData.setModel(model)
-        #[listData.setColumnWidth(i, listData.columnWidth(i)*2) for i in range(len(header)-2, len(header)) ]
         self.ui.listData.selectionModel().selectionChanged.connect(self._selectionChanged)
         self.ui.pictureShow.setText(u'请选择一列以显示图片')
+
+        self.statusBar().setStyleSheet('background:#33FF99')
+        if model.rowCount(None) > 0:
+            self._setStatusMsg(u'选择一行或多行修改/删除数据')
+        else:
+            self._setStatusMsg(u'还没有数据，请点击增加新记录添加数据')
 
     def _getSelectedMode(self):
         selectedText = unicode(self.ui.modeSelector.currentText())
@@ -81,7 +84,7 @@ class MainApp(QMainWindow):
         data = self.ui.listData
         rows = [selected.row() for selected in data.selectionModel().selectedRows()]
         result = [str(row) for row in rows if data.model().removeRow(row)]
-        print "Removed %d rows <%s> successfully!"%(len(result), ','.join(result))
+        self._setStatusMsg(u"成功删除了%d行数据，行号:%s"%(len(result), ','.join(result)), 2000)
             
 
     def _selectionChanged(self, selected, deselected):
@@ -93,7 +96,7 @@ class MainApp(QMainWindow):
             rows = [selected.row() for selected in data.selectionModel().selectedRows()]
             rows.sort()
             rows = [str(id) for id in rows]
-            print "selected rows:%s"%(','.join(rows))
+            self._setStatusMsg(u"选择了如下行:%s"%(','.join(rows)), 2000)
             #enable del/modify, disable new
             self.ui.btnAdd.setDisabled(True)
             self.ui.btnModify.setEnabled(len(rows) == 1)
@@ -122,6 +125,10 @@ class MainApp(QMainWindow):
             rect = picShow.frameRect()
             pixmap.scaled(rect.width(), rect.height(), Qt.KeepAspectRatioByExpanding)
             self.ui.pictureShow.setPixmap(pixmap)
+
+    def _setStatusMsg(self, msg, timeout = 0):
+        ''' set status hints'''
+        self.statusBar().showMessage(msg, timeout)
 
 
 if __name__ == "__main__":

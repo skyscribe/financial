@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainForm.ui'
 #
-# Created: Thu Feb 21 16:29:40 2013
+# Created: Sat Feb 23 15:13:13 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,20 +17,16 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(946, 629)
+        MainWindow.resize(975, 635)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.label_2 = QtGui.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(20, 20, 101, 21))
-        self.label_2.setStyleSheet(_fromUtf8("color: green"))
-        self.label_2.setObjectName(_fromUtf8("label_2"))
         self.modeSelector = QtGui.QComboBox(self.centralwidget)
-        self.modeSelector.setGeometry(QtCore.QRect(210, 20, 451, 27))
+        self.modeSelector.setGeometry(QtCore.QRect(80, 20, 191, 27))
         self.modeSelector.setStyleSheet(_fromUtf8("background:rgb(0, 255, 255);\n"
 "color: rgb(170, 0, 255);"))
         self.modeSelector.setObjectName(_fromUtf8("modeSelector"))
         self.layoutWidget = QtGui.QWidget(self.centralwidget)
-        self.layoutWidget.setGeometry(QtCore.QRect(20, 50, 641, 551))
+        self.layoutWidget.setGeometry(QtCore.QRect(290, 20, 671, 581))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setMargin(0)
@@ -56,27 +52,29 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.btnModify)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.label = QtGui.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(670, 20, 261, 21))
+        self.label.setGeometry(QtCore.QRect(10, 330, 261, 21))
         self.label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setObjectName(_fromUtf8("label"))
         self.pictureShow = QtGui.QLabel(self.centralwidget)
-        self.pictureShow.setGeometry(QtCore.QRect(670, 50, 261, 251))
+        self.pictureShow.setGeometry(QtCore.QRect(10, 350, 261, 251))
         self.pictureShow.setFrameShape(QtGui.QFrame.StyledPanel)
         self.pictureShow.setText(_fromUtf8(""))
         self.pictureShow.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.pictureShow.setObjectName(_fromUtf8("pictureShow"))
         self.pictureShow_2 = QtGui.QLabel(self.centralwidget)
-        self.pictureShow_2.setGeometry(QtCore.QRect(670, 350, 261, 251))
+        self.pictureShow_2.setGeometry(QtCore.QRect(10, 50, 261, 281))
         self.pictureShow_2.setFrameShape(QtGui.QFrame.StyledPanel)
         self.pictureShow_2.setText(_fromUtf8(""))
         self.pictureShow_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.pictureShow_2.setObjectName(_fromUtf8("pictureShow_2"))
         self.label_3 = QtGui.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(670, 320, 261, 21))
+        self.label_3.setGeometry(QtCore.QRect(10, 20, 61, 21))
         self.label_3.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar.setStyleSheet(_fromUtf8("background: rgb(0, 255, 127)"))
+        self.statusbar.setSizeGripEnabled(True)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
 
@@ -89,7 +87,6 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "记账/查看工具", None, QtGui.QApplication.UnicodeUTF8))
         MainWindow.setToolTip(QtGui.QApplication.translate("MainWindow", "<html><head/><body><p>这是一个简单的几张查看/添加工具</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         MainWindow.setWhatsThis(QtGui.QApplication.translate("MainWindow", "简单记账管理工具", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("MainWindow", "选择显示类型", None, QtGui.QApplication.UnicodeUTF8))
         self.btnAdd.setText(QtGui.QApplication.translate("MainWindow", "增加新记录", None, QtGui.QApplication.UnicodeUTF8))
         self.btnDel.setText(QtGui.QApplication.translate("MainWindow", "删除当前记录", None, QtGui.QApplication.UnicodeUTF8))
         self.btnModify.setText(QtGui.QApplication.translate("MainWindow", "修改记录", None, QtGui.QApplication.UnicodeUTF8))
