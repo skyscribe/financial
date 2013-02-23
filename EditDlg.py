@@ -9,6 +9,9 @@ from PyQt4.QtCore import QDateTime
 from modify import Ui_EditDlg
 import os.path
 
+categories = [u'进货', u'出货']
+CATEGORY_IN, CATEGORY_OUT = [0,1]
+
 class EditDlg(QDialog):
     def __init__(self, parent, mode):
         QWidget.__init__(self, parent)
@@ -19,8 +22,7 @@ class EditDlg(QDialog):
         self.mode = mode
         self._hasUpdates = False
 
-        self.categories = [u'进货', u'出货']
-        self.ui.comboCategory.addItems(self.categories)
+        self.ui.comboCategory.addItems(categories)
         self.ui.comboCategory.setCurrentIndex(0);
         self.ui.btnChooser.clicked.connect(self._chooseFile)
 
@@ -64,11 +66,11 @@ class EditDlg(QDialog):
         self.ui.editComments.setText(fetchValue('Comments'))
         self.ui.editPic.setText(fetchValue('Pic'))
 
-        catMatches = [k for k in self.categories if fetchValue('Category') == k]
+        catMatches = [k for k in categories if fetchValue('Category') == k]
         if len(catMatches) == 0:
             self.ui.comboCategory.setCurrentIndex(0)
         else:
-            self.ui.comboCategory.setCurrentIndex(self.categories.index(catMatches[0]))
+            self.ui.comboCategory.setCurrentIndex(categories.index(catMatches[0]))
  
     def accept(self):
         '''Accept the changes'''

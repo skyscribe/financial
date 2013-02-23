@@ -11,31 +11,26 @@ from PyQt4.QtGui import QWidget
 
 from mainForm import Ui_MainWindow
 from EditDlg import EditDlg
+from EditDlg import CATEGORY_IN
+from EditDlg import CATEGORY_OUT
 import sys
 
 ###############################################################################
 class MainApp(QMainWindow):
+    modes = [u'总帐目-出货',u'总帐目 - 进货', u'个人帐']
+    MODE_TOTAL_IN, MODE_TOTAL_OUT, MODE_PERSONAL = [0,1,2]
     def __init__(self, parent = None):
         QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        #Constant infoG
-        self.modes = {
-            "totalIn" : u'总帐目-出货',
-            "totalOut" : u'总帐目 - 进货',
-            "personal" : u'个人帐', 
-        }
-
+        
         self._initData()
         self._bindSignals()
         self._setInitialShow()
 
     def _initData(self):
         '''Initialize the data'''
-        names = [v for (k,v) in self.modes.items()]
-        names.sort()
-        self.ui.modeSelector.addItems(names)     
+        self.ui.modeSelector.addItems(self.modes)     
         self.ui.btnModify.setDisabled(True)
         self.ui.btnDel.setDisabled(True)
 
@@ -45,11 +40,11 @@ class MainApp(QMainWindow):
         self.ui.btnModify.clicked.connect(self._modifyRecord)
         self.ui.btnDel.clicked.connect(self._delRecords)
         self.ui.listData.doubleClicked.connect(self._modifyRecord)
+        self.ui.modeSelector.currentIndexChanged.connect(self._updateSummaryInfo)
 
     def _setInitialShow(self):
         ''' Set initial data show and styles'''
-        self._mode = self._getSelectedMode()
-        model = createDataModel(self._getSelectedMode())
+        model = createDataModel()
         self.ui.listData.setModel(model)
         self.ui.listData.selectionModel().selectionChanged.connect(self._selectionChanged)
         self.ui.pictureShow.setText(u'请选择一列以显示图片')
@@ -57,16 +52,9 @@ class MainApp(QMainWindow):
         self.statusBar().setStyleSheet('background:#33FF99')
         if model.rowCount(None) > 0:
             self.setStatusMsg(u'选择一行或多行修改/删除数据')
+            self._updateSummaryInfo()
         else:
             self.setStatusMsg(u'还没有数据，请点击增加新记录添加数据')
-
-    def _getSelectedMode(self):
-        selectedText = unicode(self.ui.modeSelector.currentText())
-        modes = [k for (k,v) in self.modes.items() if v == selectedText ]
-        if len(modes) == 0:
-            raise Exception(u"Bad mode, current selected text: %s" % selectedText)
-        return modes[0]
-        
 
     def saveAndFlushData(self):
         ''' Save and flush the list data '''
@@ -99,15 +87,19 @@ class MainApp(QMainWindow):
             self.setStatusMsg(u"选择了如下行:%s"%(','.join(rows)), 2000)
             #enable del/modify, disable new
             self.ui.btnAdd.setDisabled(True)
-            self.ui.btnModify.setEnabled(len(rows) == 1)
+            if len(rows) == 1:
+                self.ui.btnModify.setEnabled(len(rows) == 1)
+                self._showCurrentPicture(newSelRow)
+                self._updateSummaryInfo()
             self.ui.btnDel.setEnabled(True)
-            self._showCurrentPicture(newSelRow)
+            self.ui.modeSelector.setCurrentIndex(self.MODE_PERSONAL)
         else:
             #enable new, disable del/modify
             self.ui.btnAdd.setEnabled(True)
             self.ui.btnModify.setDisabled(True)
             self.ui.btnDel.setDisabled(True)
             self.ui.pictureShow.setText(u'请选择一行以显示图片')
+            self.ui.modeSelector.setCurrentIndex(self.MODE_TOTAL_OUT)
 
     def _showCurrentPicture(self, selRow):
         '''Show current selected item's picture'''
@@ -126,10 +118,57 @@ class MainApp(QMainWindow):
             pixmap.scaled(rect.width(), rect.height(), Qt.KeepAspectRatioByExpanding)
             self.ui.pictureShow.setPixmap(pixmap)
 
+    def _updateSummaryInfo(self):
+        ''' update the summary text '''
+        curMode = self.ui.modeSelector.currentIndex() 
+        actions = {
+                self.MODE_TOTAL_IN: self._showOverallIn,
+                self.MODE_TOTAL_OUT: self._showOverallOut,
+                self.MODE_PERSONAL: self._showPersonal
+                }
+        if actions[curMode]():
+            self.ui.summaryInfo.setText(self._infoTxt)
+
+
+    def _showOverallIn(self):
+        self._infoTxt = u'进货信息合计\n'
+        stats = self.ui.listData.model().getStatistic(cat = CATEGORY_IN)
+        self._infoTxt += getSummaryFromStats(stats)
+        return True
+
+    def _showOverallOut(self):
+        self._infoTxt = u'出货信息合计\n'
+        stats = self.ui.listData.model().getStatistic(cat = CATEGORY_OUT)
+        self._infoTxt += getSummaryFromStats(stats)
+        return True
+
+    def _showPersonal(self):
+        data = self.ui.listData
+        rows = [selected.row() for selected in data.selectionModel().selectedRows()]
+        if len(rows) == 0:
+            self.setStatusMsg(u"必须选中某个人才能显示个人统计信息", 1000)
+            self.ui.modeSelector.setCurrentIndex(self.MODE_TOTAL_OUT)
+            return False
+        else:
+            model = data.model()
+            self._infoTxt = u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]),
+                    model.getCategory(rows[0]))
+            stats = data.model().getStatistic(rows[0])
+            self._infoTxt += getSummaryFromStats(stats)
+            return True
+
     def setStatusMsg(self, msg, timeout = 0):
         ''' set status hints'''
         self.statusBar().showMessage(msg, timeout)
 
+
+def getSummaryFromStats(stats):
+    result = u''
+    for (k,v) in stats.items():
+        result += u'\t%6s => %8d\n'%(k,v)
+    result += u'\t---------------------------------\n'
+    result += u'\t%6s => %8d\n'%(u'总计', sum([stat for stat in stats.values()]))
+    return result
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

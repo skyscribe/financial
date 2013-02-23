@@ -128,7 +128,7 @@ color: rgb(170, 0, 255);</string>
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
     </property>
    </widget>
-   <widget class="QLabel" name="pictureShow_2">
+   <widget class="QLabel" name="summaryInfo">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -167,7 +167,7 @@ color: rgb(170, 0, 255);</string>
    <zorder>modeSelector</zorder>
    <zorder>label</zorder>
    <zorder>pictureShow</zorder>
-   <zorder>pictureShow_2</zorder>
+   <zorder>summaryInfo</zorder>
    <zorder>label_3</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar">

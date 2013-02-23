@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainForm.ui'
 #
-# Created: Sat Feb 23 15:13:13 2013
+# Created: Sat Feb 23 16:25:43 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -61,12 +61,12 @@ class Ui_MainWindow(object):
         self.pictureShow.setText(_fromUtf8(""))
         self.pictureShow.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.pictureShow.setObjectName(_fromUtf8("pictureShow"))
-        self.pictureShow_2 = QtGui.QLabel(self.centralwidget)
-        self.pictureShow_2.setGeometry(QtCore.QRect(10, 50, 261, 281))
-        self.pictureShow_2.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.pictureShow_2.setText(_fromUtf8(""))
-        self.pictureShow_2.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.pictureShow_2.setObjectName(_fromUtf8("pictureShow_2"))
+        self.summaryInfo = QtGui.QLabel(self.centralwidget)
+        self.summaryInfo.setGeometry(QtCore.QRect(10, 50, 261, 281))
+        self.summaryInfo.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.summaryInfo.setText(_fromUtf8(""))
+        self.summaryInfo.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.summaryInfo.setObjectName(_fromUtf8("summaryInfo"))
         self.label_3 = QtGui.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(10, 20, 61, 21))
         self.label_3.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)

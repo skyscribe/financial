@@ -5,16 +5,14 @@ from PyQt4.QtCore import QAbstractTableModel
 from PyQt4.QtCore import QVariant
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import SIGNAL
+from EditDlg import categories
 import operator
 import json
 import codecs
 
-def createDataModel(mode):
-    ''' create a new data model based on given mode'''
-    if mode == 'personal':
-        return DetailedDataModel()
-    else:
-        raise Exception("Undefined model for mode %s"%mode)
+def createDataModel():
+    ''' create a new data model'''
+    return DetailedDataModel()
 
 ###############################################################################
 class DetailedDataModel(QAbstractTableModel): 
@@ -152,3 +150,44 @@ class DetailedDataModel(QAbstractTableModel):
                 out.write(u"%s,"%row[col])
             out.write("\n")
             rowId = rowId + 1
+
+    def getName(self, row):
+        return self.dataArray[row][self.getColIndexByName('Name')]
+
+    def getCategory(self, row):
+        return self.dataArray[row][self.getColIndexByName('Category')]
+
+    def getStatistic(self, selectedRow = -1, cat = -1):
+        '''
+        return statistics like:
+            IN:
+                TypeA: 100
+                TypeB: 200
+                TypeC: 300
+        or:
+            OUT:
+                Type1: 200
+                Type2: 400
+        '''
+        result = {}
+        nameCol = self.getColIndexByName('Name')
+        catCol = self.getColIndexByName('Category')
+        if selectedRow in range(0, len(self.dataArray)):
+            name = self.dataArray[selectedRow][nameCol]
+            category = self.dataArray[selectedRow][catCol]
+        else:
+            name = ''
+            category = categories[cat]
+
+        nameMatch = lambda data: name == '' and True or data[nameCol] == name
+        catMatch = lambda data: category == -1 and True or data[catCol] == category
+        filtered = [data for data in self.dataArray if nameMatch(data) and catMatch(data)]
+
+        print "matched count:%d"%len(filtered)
+        typeCol = self.getColIndexByName('Type')
+        priceCol = self.getColIndexByName('Price')
+        types = list(set([data[typeCol] for data in filtered]))
+        for type in types:
+            result[type] = sum([int(data[priceCol]) for data in filtered if type == data[typeCol] ])
+        return result
+
