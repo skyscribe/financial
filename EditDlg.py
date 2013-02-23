@@ -28,8 +28,7 @@ class EditDlg(QDialog):
     def _prepForAdd(self):
         model = self.listData.model()
         #Load id
-        newId = model.rowCount(None) + 1
-        self.ui.editID.setText(str(newId))
+        self.ui.editID.setText(str(model.getNewUnusedId()))
         #Set current time
         self.ui.editTime.setDateTime(QDateTime.currentDateTime())
 
@@ -58,15 +57,17 @@ class EditDlg(QDialog):
             self.ui.editTime.setDateTime(QDateTime.currentDateTime())
             row = self.listData.selectedIndexes()[0].row()
 
-        itemData = [ 
-            self.ui.editID.toPlainText(),
-            self.ui.editName.toPlainText(),
-            self.ui.editType.toPlainText(),
-            self.ui.editPrice.toPlainText(),
-            self.ui.editTime.dateTime().toString("yyyy-MM-dd HH:mm:ss"),
-            self.ui.editComments.toPlainText(),
-            self.ui.editPic.toPlainText(),
-        ]
+        getEditText = lambda name: getattr(self.ui, name).toPlainText()
+        getColTag = lambda tagName : model.getColTagByName(tagName)
+        itemData = { 
+                getColTag('ID') : getEditText('editID'),
+                getColTag('Name') : getEditText('editName'),
+                getColTag('Type') : getEditText('editType'),
+                getColTag('Price') : getEditText('editPrice'),
+                getColTag('Time') : self.ui.editTime.dateTime().toString("yyyy-MM-dd HH:mm:ss"),
+                getColTag('Comments') : getEditText('editComments'),
+                getColTag('Pic') : getEditText('editPic'),
+            }
         model.updateWholeRow(row, itemData)
         
 

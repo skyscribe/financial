@@ -7,6 +7,7 @@ from PyQt4.QtCore import Qt
 from PyQt4.QtCore import SIGNAL
 import operator
 import json
+import sys
 import codecs
 
 def createDataModel(mode):
@@ -26,6 +27,7 @@ class DetailedDataModel(QAbstractTableModel):
         self.dataFile = "data.json"
         self._jsonData = json.load(codecs.getreader('utf-8')(open(self.dataFile)))
         self.header = [u'标记', u'名字', u'分类', u'价格', u'时间', u'备注', u'图片']
+        self.headerLiteral = ['ID', 'Name', 'Type', 'Price', 'Time', 'Comments', 'Pic']
 
         dataArray = []
         for data in self._jsonData:
@@ -35,6 +37,9 @@ class DetailedDataModel(QAbstractTableModel):
         self.dataArray = dataArray
 
         self.defaultData = [1, u'name', u'type', u'price', u'time', u'comments', u'pics']
+
+    def getColTagByName(self, name):
+        return self.header[self.headerLiteral.index(name)]
 
     def rowCount(self, parent): 
         return len(self.dataArray) 
@@ -58,19 +63,34 @@ class DetailedDataModel(QAbstractTableModel):
         return QVariant()
 
     def updateWholeRow(self, row, itemData):
-        '''Update whole role using given itemData'''
-        self.emit(SIGNAL("layoutAboutToBeChanged()"))
-        for value in itemData:
-            col = itemData.index(value)
-            self.dataArray[row][col] = unicode(value)
+        '''
+        Update whole role using given itemData, data shall in format of
+        '''
+        #print "====Before update, rows:"
+        #self.dumpData(sys.stdout)
         self.emit(SIGNAL("layoutChanged()"))
-        #Data would be saved upon exit
-        #self.saveData()
+        self.emit(SIGNAL("layoutAboutToBeChanged()"))
+        print "updating row:%d"%row
+        for (tag, value) in itemData.items():
+            col = self.header.index(tag)
+            self.dataArray[row][col] = unicode(value)
+            print u'setting array[%d][%d] to %s'%(row, col, value)
+
+        #print "@@@@@@After update, rows:"
+        #self.dumpData(sys.stdout)
+        self.emit(SIGNAL("layoutChanged()"))
 
     def insertRows(self, row, cnt, parent):
         self.beginInsertRows(parent, row, row + cnt - 1)
+        #self.dumpData(sys.stdout, "###### Before insert, rows:")
         for i in range(0, cnt):
-            self.dataArray.insert(row, self.defaultData)
+            print "Inserting row %d, total rows:%d"%(row, len(self.dataArray))
+            print "default:", self.defaultData
+            if row < len(self.dataArray):
+                self.dataArray.insert(row, list(self.defaultData))
+            else:
+                self.dataArray.append(list(self.defaultData))
+        #self.dumpData(sys.stdout, "----- After insert, rows:")
         self.endInsertRows()
         return True
 
@@ -109,3 +129,18 @@ class DetailedDataModel(QAbstractTableModel):
         json.dump(jsonArray, codecs.getwriter('utf-8')(open(self.dataFile, "w")),
                 indent = 4)
 
+    def getNewUnusedId(self):
+        '''choose an unique unused id, for adding'''
+        idSet = [ int(str(item[0])) for item in self.dataArray ]
+        unusedId = min(list(set(range(1, len(idSet) + 2)) - set(idSet)))
+        return unusedId
+
+    def dumpData(self, out, hint = ""):
+        if hint != "":
+            out.write(hint + "\n")
+        rowId = 1
+        for row in self.dataArray:
+            for col in range(0, len(self.dataArray[0])):
+                out.write(u"%s,"%row[col])
+            out.write("\n")
+            rowId = rowId + 1

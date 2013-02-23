@@ -42,10 +42,10 @@ class MainApp(QMainWindow):
         self.ui.btnDel.setDisabled(True)
 
     def _bindSignals(self):
-        self.ui.listData.clicked.connect(self._showCurrentPicture)
+        #self.ui.listData.clicked.connect(self._showCurrentPicture)
         self.ui.btnAdd.clicked.connect(self._addRecord)
         self.ui.btnModify.clicked.connect(self._modifyRecord)
-        self.ui.btnDel.clicked.connect(self._delRecord)
+        self.ui.btnDel.clicked.connect(self._delRecords)
         self.ui.listData.doubleClicked.connect(self._modifyRecord)
 
     def _showDataInList(self):
@@ -54,9 +54,8 @@ class MainApp(QMainWindow):
         model = createDataModel(self._getSelectedMode())
         self.ui.listData.setModel(model)
         #[listData.setColumnWidth(i, listData.columnWidth(i)*2) for i in range(len(header)-2, len(header)) ]
-        selModel = self.ui.listData.selectionModel()
-        selModel.selectionChanged.connect(self._selectionChanged)
-        print "bind selection on model:", selModel
+        self.ui.listData.selectionModel().selectionChanged.connect(self._selectionChanged)
+        self.ui.pictureShow.setText(u'请选择一列以显示图片')
 
     def _getSelectedMode(self):
         selectedText = unicode(self.ui.modeSelector.currentText())
@@ -65,28 +64,6 @@ class MainApp(QMainWindow):
             raise Exception(u"Bad mode, current selected text: %s" % selectedText)
         return modes[0]
         
-
-    def _showCurrentPicture(self):
-        '''Show current selected item's picture'''
-        selected = self.ui.listData.selectedIndexes()[0]
-        row = selected.row()
-        model = self.ui.listData.model()
-        picPath = model.data(model.createIndex(row, model.getPicRowIndex())).toString()
-        #self.ui.pictureShow.setText(u'选择了第%d列, 地址为:%s'%(row, picData))
-        #TODO: using QPixelMap to load and show the image for correct scale
-
-        picShow = self.ui.pictureShow
-        pixmap = QPixmap(picPath)
-        if pixmap.isNull():
-            picShow.setText(u'第%d行数据对应的图片\n[%s]\n\n无法加载显示！'%(row, picPath))
-        else:
-            rect = picShow.frameRect()
-            pixmap.scaled(rect.width(), rect.height(), Qt.KeepAspectRatioByExpanding)
-            self.ui.pictureShow.setPixmap(pixmap)
-
-        #Enable other 2 buttons
-        self.ui.btnModify.setEnabled(True)
-        self.ui.btnDel.setEnabled(True)
 
     def saveAndFlushData(self):
         ''' Save and flush the list data '''
@@ -100,27 +77,46 @@ class MainApp(QMainWindow):
         dlg = EditDlg(self, 'add')
         ret = dlg.exec_()
 
-    def _delRecord(self):
-        selected = self.ui.listData.selectedIndexes()[0]
-        row = selected.row()
-        model = self.ui.listData.model()
-        model.removeRow(row)
+    def _delRecords(self):
+        data = self.ui.listData
+        result = [data.model().removeRow(selected.row()) for selected in data.selectedIndexes()]
+        print "Removed %d of %d rows successfully!"%(result.count(True), len(result))
+            
 
     def _selectionChanged(self, selected, deselected):
         getRow = lambda sel : len(sel.indexes()) != 0 and sel.indexes()[0].row or (-1)
         newSelRow = getRow(selected)
         oldSelRow = getRow(deselected)
+        multiSel = len(selected.indexes()) > 1
         if newSelRow != -1:
             #enable del/modify, disable new
             self.ui.btnAdd.setDisabled(True)
-            self.ui.btnModify.setEnabled(True)
+            self.ui.btnModify.setEnabled(not multiSel)
             self.ui.btnDel.setEnabled(True)
+            self._showCurrentPicture(newSelRow)
         else:
             #enable new, disable del/modify
             self.ui.btnAdd.setEnabled(True)
             self.ui.btnModify.setDisabled(True)
             self.ui.btnDel.setDisabled(True)
+            self.ui.pictureShow.setText(u'请选择一行以显示图片')
 
+    def _showCurrentPicture(self, selRow):
+        '''Show current selected item's picture'''
+        selRow = selRow()
+        model = self.ui.listData.model()
+        picPath = model.data(model.createIndex(selRow, model.getPicRowIndex())).toString()
+        #self.ui.pictureShow.setText(u'选择了第%d列, 地址为:%s'%(selRow, picData))
+        #TODO: using QPixelMap to load and show the image for correct scale
+
+        picShow = self.ui.pictureShow
+        pixmap = QPixmap(picPath)
+        if pixmap.isNull():
+            picShow.setText(u'第%d行数据对应的图片\n[%s]\n\n无法加载显示！'%(selRow, picPath))
+        else:
+            rect = picShow.frameRect()
+            pixmap.scaled(rect.width(), rect.height(), Qt.KeepAspectRatioByExpanding)
+            self.ui.pictureShow.setPixmap(pixmap)
 
 
 if __name__ == "__main__":
