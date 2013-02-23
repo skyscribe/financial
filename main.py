@@ -24,9 +24,21 @@ class MainApp(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
+        self._initMenu()
         self._initData()
         self._bindSignals()
         self._setInitialShow()
+
+    def _initMenu(self):
+        fileMenu = self.menuBar().addMenu(u'文件')
+        menuOpen = fileMenu.addAction(u'打开历史文件')
+        menuExit = fileMenu.addAction(u'退出...')
+        menuExitEx = fileMenu.addAction(u'退出并取消本次所有改动')
+        dataMenu = self.menuBar().addMenu(u'数据')
+        dataMenu.addAction('导出...')
+        aboutMenu = self.menuBar().addMenu(u'关于')
+        print "menubar set done"
+        self.menuBar().show()
 
     def _initData(self):
         '''Initialize the data'''
@@ -74,6 +86,7 @@ class MainApp(QMainWindow):
         rows = [selected.row() for selected in data.selectionModel().selectedRows()]
         result = [str(row) for row in rows if data.model().removeRow(row)]
         self.setStatusMsg(u"成功删除了%d行数据，行号:%s"%(len(result), ','.join(result)), 2000)
+        self._updateSummaryInfo()
             
 
     def _selectionChanged(self, selected, deselected):

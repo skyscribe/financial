@@ -8,6 +8,7 @@ from PyQt4.QtCore import SIGNAL
 from EditDlg import categories
 import operator
 import json
+import os
 import codecs
 
 def createDataModel():
@@ -22,11 +23,14 @@ class DetailedDataModel(QAbstractTableModel):
         """
         QAbstractTableModel.__init__(self, parent, *args) 
         self.dataFile = "data.json"
-        self._jsonData = json.load(codecs.getreader('utf-8')(open(self.dataFile)))
         self.header = [u'标记', u'名字', u'分类', u'进/出货', u'价格', u'时间', u'备注', u'图片']
         self.headerLiteral = ['ID', 'Name', 'Type', 'Category', 'Price', 'Time', 'Comments', 'Pic']
 
         dataArray = []
+        if os.access(self.dataFile, os.F_OK):
+            self._jsonData = json.load(codecs.getreader('utf-8')(open(self.dataFile)))
+        else:
+            self._jsonData = []
         for data in self._jsonData:
             id, info = data['id'], data['contents']
             dataArray.append([id, info['name'], info['type'], info['category'], info['price'], 
@@ -45,7 +49,7 @@ class DetailedDataModel(QAbstractTableModel):
         return len(self.dataArray) 
 
     def columnCount(self, parent): 
-        return len(self.dataArray[0]) 
+        return len(self.header) 
 
     def getPicRowIndex(self):
         return len(self.header) - 1
@@ -70,11 +74,9 @@ class DetailedDataModel(QAbstractTableModel):
         #self.dumpData(sys.stdout)
         self.emit(SIGNAL("layoutChanged()"))
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
-        print "updating row:%d"%row
         for (tag, value) in itemData.items():
             col = self.header.index(tag)
             self.dataArray[row][col] = unicode(value)
-            print u'setting array[%d][%d] to %s'%(row, col, value)
 
         #print "@@@@@@After update, rows:"
         #self.dumpData(sys.stdout)
@@ -117,7 +119,6 @@ class DetailedDataModel(QAbstractTableModel):
 
     def saveData(self):
         '''Save data to json file'''
-        print "saving data..."
         jsonArray = []
         for record in self.dataArray:
             id, name, type, category, price, date, comments, pic = record
@@ -134,6 +135,11 @@ class DetailedDataModel(QAbstractTableModel):
                     }})
         json.dump(jsonArray, codecs.getwriter('utf-8')(open(self.dataFile, "w")),
                 indent = 4)
+        from shutil import copyfile
+        from datetime import datetime
+        timestamp = str(datetime.now()).replace('-', '').replace(' ', '-').replace(':', '')
+        cacheFileName = self.dataFile.replace('.', '.%s.'%timestamp)
+        copyfile(self.dataFile, os.path.sep.join(['history', cacheFileName]))
 
     def getNewUnusedId(self):
         '''choose an unique unused id, for adding'''
@@ -142,8 +148,9 @@ class DetailedDataModel(QAbstractTableModel):
         return unusedId
 
     def dumpData(self, out, hint = ""):
-        if hint != "":
+        if hint != "" and out == sys.stdout:
             out.write(hint + "\n")
+        out.write('%s\n', u','.join(self.header))
         rowId = 1
         for row in self.dataArray:
             for col in range(0, len(self.dataArray[0])):
@@ -183,7 +190,7 @@ class DetailedDataModel(QAbstractTableModel):
         catMatch = lambda data: category == -1 and True or data[catCol] == category
         filtered = [data for data in self.dataArray if nameMatch(data) and catMatch(data)]
 
-        print "matched count:%d"%len(filtered)
+        #print "matched count:%d"%len(filtered)
         typeCol = self.getColIndexByName('Type')
         priceCol = self.getColIndexByName('Price')
         types = list(set([data[typeCol] for data in filtered]))

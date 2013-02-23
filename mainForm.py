@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainForm.ui'
 #
-# Created: Sat Feb 23 17:49:35 2013
+# Created: Sat Feb 23 22:39:54 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,16 +17,16 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(975, 635)
+        MainWindow.resize(975, 653)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.modeSelector = QtGui.QComboBox(self.centralwidget)
-        self.modeSelector.setGeometry(QtCore.QRect(80, 20, 191, 27))
+        self.modeSelector.setGeometry(QtCore.QRect(80, 10, 191, 27))
         self.modeSelector.setStyleSheet(_fromUtf8("background:rgb(0, 255, 255);\n"
 "color: rgb(170, 0, 255);"))
         self.modeSelector.setObjectName(_fromUtf8("modeSelector"))
         self.layoutWidget = QtGui.QWidget(self.centralwidget)
-        self.layoutWidget.setGeometry(QtCore.QRect(290, 20, 671, 581))
+        self.layoutWidget.setGeometry(QtCore.QRect(290, 10, 671, 581))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setMargin(0)
@@ -53,21 +53,21 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.btnModify)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.label = QtGui.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(10, 330, 261, 21))
+        self.label.setGeometry(QtCore.QRect(10, 320, 261, 21))
         self.label.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label.setObjectName(_fromUtf8("label"))
         self.pictureShow = QtGui.QLabel(self.centralwidget)
-        self.pictureShow.setGeometry(QtCore.QRect(10, 350, 261, 251))
+        self.pictureShow.setGeometry(QtCore.QRect(10, 340, 261, 251))
         self.pictureShow.setFrameShape(QtGui.QFrame.StyledPanel)
         self.pictureShow.setText(_fromUtf8(""))
         self.pictureShow.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.pictureShow.setObjectName(_fromUtf8("pictureShow"))
         self.label_3 = QtGui.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(10, 20, 61, 21))
+        self.label_3.setGeometry(QtCore.QRect(10, 10, 61, 21))
         self.label_3.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.summaryInfo = QtGui.QTextBrowser(self.centralwidget)
-        self.summaryInfo.setGeometry(QtCore.QRect(10, 60, 261, 261))
+        self.summaryInfo.setGeometry(QtCore.QRect(10, 50, 261, 261))
         self.summaryInfo.setFrameShape(QtGui.QFrame.StyledPanel)
         self.summaryInfo.setFrameShadow(QtGui.QFrame.Sunken)
         self.summaryInfo.setOpenLinks(False)
@@ -78,6 +78,17 @@ class Ui_MainWindow(object):
         self.statusbar.setSizeGripEnabled(True)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
+        self.menuBar = QtGui.QMenuBar(MainWindow)
+        self.menuBar.setEnabled(True)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.menuBar.sizePolicy().hasHeightForWidth())
+        self.menuBar.setSizePolicy(sizePolicy)
+        self.menuBar.setAutoFillBackground(True)
+        self.menuBar.setDefaultUp(True)
+        self.menuBar.setObjectName(_fromUtf8("menuBar"))
+        MainWindow.setMenuBar(self.menuBar)
 
         self.retranslateUi(MainWindow)
         self.modeSelector.setCurrentIndex(-1)
