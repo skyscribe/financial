@@ -33,12 +33,16 @@ class MainApp(QMainWindow):
         fileMenu = self.menuBar().addMenu(u'文件')
         menuOpen = fileMenu.addAction(u'打开历史文件')
         menuExit = fileMenu.addAction(u'退出...')
+        menuExit.triggered.connect(self._exit)
         menuExitEx = fileMenu.addAction(u'退出并取消本次所有改动')
         dataMenu = self.menuBar().addMenu(u'数据')
         dataMenu.addAction('导出...')
         aboutMenu = self.menuBar().addMenu(u'关于')
-        print "menubar set done"
-        self.menuBar().show()
+
+    def _exit(self):
+        self.setStatusMsg(u"正在保存数据......");
+        self.saveAndFlushData()
+        self.close()
 
     def _initData(self):
         '''Initialize the data'''
@@ -189,6 +193,6 @@ if __name__ == "__main__":
     myapp = MainApp()
     myapp.show()
     ret = app.exec_()
-    myapp.saveAndFlushData()
+    #myapp.saveAndFlushData()
     sys.exit(ret)
 
