@@ -19,6 +19,7 @@ class EditDlg(QDialog):
         self.ui.setupUi(self)
         self.listData = parent.ui.listData
         self.setStatusMsg = parent.setStatusMsg
+        self.postAction = parent._updateSummaryInfo
         self.mode = mode
         self._hasUpdates = False
 
@@ -101,6 +102,7 @@ class EditDlg(QDialog):
             getColTag('Category') : self.ui.comboCategory.currentText(), 
             }
         model.updateWholeRow(row, itemData)
+        self.postAction()
         return True
         
     def reject(self):

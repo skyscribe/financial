@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainForm.ui'
 #
-# Created: Sat Feb 23 16:25:43 2013
+# Created: Sat Feb 23 17:49:35 2013
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -32,6 +32,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.listData = QtGui.QTableView(self.layoutWidget)
+        self.listData.setFrameShadow(QtGui.QFrame.Raised)
         self.listData.setEditTriggers(QtGui.QAbstractItemView.DoubleClicked)
         self.listData.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.listData.setShowGrid(True)
@@ -61,16 +62,16 @@ class Ui_MainWindow(object):
         self.pictureShow.setText(_fromUtf8(""))
         self.pictureShow.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.pictureShow.setObjectName(_fromUtf8("pictureShow"))
-        self.summaryInfo = QtGui.QLabel(self.centralwidget)
-        self.summaryInfo.setGeometry(QtCore.QRect(10, 50, 261, 281))
-        self.summaryInfo.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.summaryInfo.setText(_fromUtf8(""))
-        self.summaryInfo.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
-        self.summaryInfo.setObjectName(_fromUtf8("summaryInfo"))
         self.label_3 = QtGui.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(10, 20, 61, 21))
         self.label_3.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.summaryInfo = QtGui.QTextBrowser(self.centralwidget)
+        self.summaryInfo.setGeometry(QtCore.QRect(10, 60, 261, 261))
+        self.summaryInfo.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.summaryInfo.setFrameShadow(QtGui.QFrame.Sunken)
+        self.summaryInfo.setOpenLinks(False)
+        self.summaryInfo.setObjectName(_fromUtf8("summaryInfo"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setStyleSheet(_fromUtf8("background: rgb(0, 255, 127)"))

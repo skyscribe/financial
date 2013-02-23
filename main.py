@@ -17,8 +17,8 @@ import sys
 
 ###############################################################################
 class MainApp(QMainWindow):
-    modes = [u'总帐目-出货',u'总帐目 - 进货', u'个人帐']
-    MODE_TOTAL_IN, MODE_TOTAL_OUT, MODE_PERSONAL = [0,1,2]
+    modes = [u'总帐目', u'个人帐']
+    MODE_TOTAL, MODE_PERSONAL = [0,1]
     def __init__(self, parent = None):
         QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
@@ -31,6 +31,7 @@ class MainApp(QMainWindow):
     def _initData(self):
         '''Initialize the data'''
         self.ui.modeSelector.addItems(self.modes)     
+        self._infoTxt = u'';
         self.ui.btnModify.setDisabled(True)
         self.ui.btnDel.setDisabled(True)
 
@@ -99,7 +100,7 @@ class MainApp(QMainWindow):
             self.ui.btnModify.setDisabled(True)
             self.ui.btnDel.setDisabled(True)
             self.ui.pictureShow.setText(u'请选择一行以显示图片')
-            self.ui.modeSelector.setCurrentIndex(self.MODE_TOTAL_OUT)
+            self.ui.modeSelector.setCurrentIndex(self.MODE_TOTAL)
 
     def _showCurrentPicture(self, selRow):
         '''Show current selected item's picture'''
@@ -122,24 +123,21 @@ class MainApp(QMainWindow):
         ''' update the summary text '''
         curMode = self.ui.modeSelector.currentIndex() 
         actions = {
-                self.MODE_TOTAL_IN: self._showOverallIn,
-                self.MODE_TOTAL_OUT: self._showOverallOut,
+                self.MODE_TOTAL: self._showOverall,
                 self.MODE_PERSONAL: self._showPersonal
                 }
         if actions[curMode]():
             self.ui.summaryInfo.setText(self._infoTxt)
 
 
-    def _showOverallIn(self):
+    def _showOverall(self):
         self._infoTxt = u'进货信息合计\n'
-        stats = self.ui.listData.model().getStatistic(cat = CATEGORY_IN)
-        self._infoTxt += getSummaryFromStats(stats)
-        return True
-
-    def _showOverallOut(self):
-        self._infoTxt = u'出货信息合计\n'
-        stats = self.ui.listData.model().getStatistic(cat = CATEGORY_OUT)
-        self._infoTxt += getSummaryFromStats(stats)
+        statsIn = self.ui.listData.model().getStatistic(cat = CATEGORY_IN)
+        self._infoTxt += getSummaryFromStats(statsIn)
+        self._infoTxt += u'\n#####################\n\n'
+        self._infoTxt += u'出货信息合计\n'
+        statsOut = self.ui.listData.model().getStatistic(cat = CATEGORY_OUT)
+        self._infoTxt += getSummaryFromStats(statsOut)
         return True
 
     def _showPersonal(self):
@@ -147,13 +145,16 @@ class MainApp(QMainWindow):
         rows = [selected.row() for selected in data.selectionModel().selectedRows()]
         if len(rows) == 0:
             self.setStatusMsg(u"必须选中某个人才能显示个人统计信息", 1000)
-            self.ui.modeSelector.setCurrentIndex(self.MODE_TOTAL_OUT)
+            self.ui.modeSelector.setCurrentIndex(self.MODE_TOTAL)
             return False
         else:
             model = data.model()
-            self._infoTxt = u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]),
-                    model.getCategory(rows[0]))
-            stats = data.model().getStatistic(rows[0])
+            self._infoTxt = u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]), u'出货')
+            stats = data.model().getStatistic(rows[0], CATEGORY_OUT)
+            self._infoTxt += getSummaryFromStats(stats)
+            self._infoTxt += u'\n#####################\n\n'
+            self._infoTxt += u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]), u'进货')
+            stats = data.model().getStatistic(rows[0], CATEGORY_IN)
             self._infoTxt += getSummaryFromStats(stats)
             return True
 

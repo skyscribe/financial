@@ -172,12 +172,12 @@ class DetailedDataModel(QAbstractTableModel):
         result = {}
         nameCol = self.getColIndexByName('Name')
         catCol = self.getColIndexByName('Category')
+
         if selectedRow in range(0, len(self.dataArray)):
             name = self.dataArray[selectedRow][nameCol]
-            category = self.dataArray[selectedRow][catCol]
         else:
             name = ''
-            category = categories[cat]
+        category = categories[cat]
 
         nameMatch = lambda data: name == '' and True or data[nameCol] == name
         catMatch = lambda data: category == -1 and True or data[catCol] == category
