@@ -96,8 +96,12 @@ class DetailedDataModel(QAbstractTableModel):
 
     def removeRows(self, row, cnt, parent):
         self.beginRemoveRows(parent, row, row + cnt - 1)
-        for i in range(0, cnt):
-            self.dataArray.pop(row + i)
+        for i in range(cnt-1, -1, -1):
+            if (row + i) < len(self.dataArray):
+                self.dataArray.pop(row + i)
+            else:
+                pass
+                #print "invalid row:%d to remove!"%(row+i)
         self.endRemoveRows()
         return True
 
@@ -105,7 +109,10 @@ class DetailedDataModel(QAbstractTableModel):
         """Sort table by given column number.
         """
         self.emit(SIGNAL("layoutAboutToBeChanged()"))
-        self.dataArray = sorted(self.dataArray, key=operator.itemgetter(Ncol))        
+        cmpFunc = None
+        if Ncol == 0 or Ncol == 3:
+            cmpFunc = lambda l,r: (int(l) - int(r))
+        self.dataArray = sorted(self.dataArray, key=operator.itemgetter(Ncol), cmp = cmpFunc)        
         if order == Qt.DescendingOrder:
             self.dataArray.reverse()
         self.emit(SIGNAL("layoutChanged()"))

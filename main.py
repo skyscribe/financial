@@ -79,19 +79,24 @@ class MainApp(QMainWindow):
 
     def _delRecords(self):
         data = self.ui.listData
-        result = [data.model().removeRow(selected.row()) for selected in data.selectedIndexes()]
-        print "Removed %d of %d rows successfully!"%(result.count(True), len(result))
+        rows = [selected.row() for selected in data.selectionModel().selectedRows()]
+        result = [str(row) for row in rows if data.model().removeRow(row)]
+        print "Removed %d rows <%s> successfully!"%(len(result), ','.join(result))
             
 
     def _selectionChanged(self, selected, deselected):
         getRow = lambda sel : len(sel.indexes()) != 0 and sel.indexes()[0].row or (-1)
         newSelRow = getRow(selected)
         oldSelRow = getRow(deselected)
-        multiSel = len(selected.indexes()) > 1
         if newSelRow != -1:
+            data = self.ui.listData
+            rows = [selected.row() for selected in data.selectionModel().selectedRows()]
+            rows.sort()
+            rows = [str(id) for id in rows]
+            print "selected rows:%s"%(','.join(rows))
             #enable del/modify, disable new
             self.ui.btnAdd.setDisabled(True)
-            self.ui.btnModify.setEnabled(not multiSel)
+            self.ui.btnModify.setEnabled(len(rows) == 1)
             self.ui.btnDel.setEnabled(True)
             self._showCurrentPicture(newSelRow)
         else:

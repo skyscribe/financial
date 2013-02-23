@@ -16,14 +16,19 @@ class EditDlg(QDialog):
         self.ui.setupUi(self)
         self.listData = parent.ui.listData
         self.mode = mode
+        self._hasUpdates = False
 
         self.ui.btnChooser.clicked.connect(self._chooseFile)
+        for ctrl in ['editName', 'editType', 'editPrice', 'editPic']:
+            getattr(self.ui, ctrl).textChanged.connect(self._dataChanged)
         
         if mode == 'add':
             self._prepForAdd()
         else:
             self._prepForModify()
 
+    def _dataChanged(self):
+        self._hasUpdates = True
 
     def _prepForAdd(self):
         model = self.listData.model()
@@ -49,6 +54,10 @@ class EditDlg(QDialog):
         self.ui.editPic.setText(fetchValue(6))
  
     def accept(self):
+        '''Accept the changes'''
+        if not self._hasUpdates:
+            return True
+
         model = self.listData.model()
         if self.mode == 'add':
             model.insertRow(model.rowCount(None))
@@ -69,10 +78,10 @@ class EditDlg(QDialog):
                 getColTag('Pic') : getEditText('editPic'),
             }
         model.updateWholeRow(row, itemData)
+        return True
         
-
     def reject(self):
-        print "rejected!"
+        return False
         
 
     def _chooseFile(self):
