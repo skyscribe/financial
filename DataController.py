@@ -11,18 +11,19 @@ import json
 import os
 import codecs
 
-def createDataModel():
+def createDataModel(fname):
     ''' create a new data model'''
-    return DetailedDataModel()
+    return DetailedDataModel(fileName = fname)
 
 ###############################################################################
 class DetailedDataModel(QAbstractTableModel): 
-    def __init__(self, parent=None, *args): 
+    DEFAULT_DATA_FILE = 'data.json'
+    def __init__(self, parent=None, fileName = 'data.json', *args): 
         """ 
-        load data from data.json
+        load data from  json file fileName
         """
         QAbstractTableModel.__init__(self, parent, *args) 
-        self.dataFile = "data.json"
+        self.dataFile = fileName
         self.header = [u'标记', u'名字', u'分类', u'进/出货', u'价格', u'时间', u'备注', u'图片']
         self.headerLiteral = ['ID', 'Name', 'Type', 'Category', 'Price', 'Time', 'Comments', 'Pic']
 
@@ -117,8 +118,8 @@ class DetailedDataModel(QAbstractTableModel):
             self.dataArray.reverse()
         self.emit(SIGNAL("layoutChanged()"))
 
-    def saveData(self):
-        '''Save data to json file'''
+    def saveData(self, fname):
+        '''Save data to json file as fname'''
         jsonArray = []
         for record in self.dataArray:
             id, name, type, category, price, date, comments, pic = record
@@ -133,13 +134,13 @@ class DetailedDataModel(QAbstractTableModel):
                         'price'    : price,
                         'comments' : comments
                     }})
-        json.dump(jsonArray, codecs.getwriter('utf-8')(open(self.dataFile, "w")),
+        json.dump(jsonArray, codecs.getwriter('utf-8')(open(fname, "w")),
                 indent = 4)
         from shutil import copyfile
         from datetime import datetime
         timestamp = str(datetime.now()).replace('-', '').replace(' ', '-').replace(':', '')
-        cacheFileName = self.dataFile.replace('.', '.%s.'%timestamp)
-        copyfile(self.dataFile, os.path.sep.join(['history', cacheFileName]))
+        cacheFileName = self.DEFAULT_DATA_FILE.replace('.', '.%s.'%timestamp)
+        copyfile(fname, os.path.sep.join(['history', cacheFileName]))
 
     def getNewUnusedId(self):
         '''choose an unique unused id, for adding'''
@@ -150,7 +151,7 @@ class DetailedDataModel(QAbstractTableModel):
     def dumpData(self, out, hint = ""):
         if hint != "" and out == sys.stdout:
             out.write(hint + "\n")
-        out.write('%s\n', u','.join(self.header))
+        out.write(u'%s\n'%(u','.join(self.header)))
         rowId = 1
         for row in self.dataArray:
             for col in range(0, len(self.dataArray[0])):

@@ -21,7 +21,7 @@ class EditDlg(QDialog):
         self.setStatusMsg = parent.setStatusMsg
         self.postAction = parent._updateSummaryInfo
         self.mode = mode
-        self._hasUpdates = False
+        self.hasUpdates = False
 
         self.ui.comboCategory.addItems(categories)
         self.ui.comboCategory.setCurrentIndex(0);
@@ -38,8 +38,7 @@ class EditDlg(QDialog):
         self.ui.comboCategory.currentIndexChanged.connect(self._dataChanged)
 
     def _dataChanged(self):
-        print "data changed!"
-        self._hasUpdates = True
+        self.hasUpdates = True
 
     def _prepForAdd(self):
         model = self.listData.model()
@@ -76,7 +75,7 @@ class EditDlg(QDialog):
     def accept(self):
         '''Accept the changes'''
         self.setStatusMsg(u'添加/修改无变化，已自动撤销', 3000)
-        if not self._hasUpdates:
+        if not self.hasUpdates:
             return True
 
         model = self.listData.model()
@@ -115,7 +114,6 @@ class EditDlg(QDialog):
         if chooser.exec_():
             file_choosed = unicode(chooser.selectedFiles()[0])
             fpath = unicode(os.path.sep).join([u"pictures", file_choosed.split(os.path.sep)[-1] ])
-            print fpath
             if not os.access(fpath, os.F_OK):
                 with open(fpath, 'wb') as ofh:
                     with open(file_choosed, 'rb') as ifh:

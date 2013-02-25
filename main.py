@@ -2,18 +2,19 @@
 # -*- coding: utf-8 -*-
 
 from DataController import createDataModel
-
+from EditDlg import CATEGORY_IN
+from EditDlg import CATEGORY_OUT
+from EditDlg import EditDlg
 from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QApplication
+from PyQt4.QtGui import QFileDialog
 from PyQt4.QtGui import QMainWindow
 from PyQt4.QtGui import QPixmap
 from PyQt4.QtGui import QWidget
-
 from mainForm import Ui_MainWindow
-from EditDlg import EditDlg
-from EditDlg import CATEGORY_IN
-from EditDlg import CATEGORY_OUT
+import os
 import sys
+import codecs
 
 ###############################################################################
 class MainApp(QMainWindow):
@@ -27,71 +28,114 @@ class MainApp(QMainWindow):
         self._initMenu()
         self._initData()
         self._bindSignals()
-        self._setInitialShow()
 
     def _initMenu(self):
         fileMenu = self.menuBar().addMenu(u'文件')
-        menuOpen = fileMenu.addAction(u'打开历史文件')
+        for fileName in  sorted([('history' + os.path.sep + fname) for fname in os.listdir('history') \
+                    if fname.startswith('data.') and fname.endswith('.json') \
+                ], reverse = True)[:10]:
+            subMenu = fileMenu.addAction(unicode(fileName))
+            subMenu.triggered.connect(lambda:self._initListData(fileName))
+        subMenu = fileMenu.addAction(u'选择历史文件...')
+        subMenu.triggered.connect(self._selectFile)
+
         menuExit = fileMenu.addAction(u'退出...')
-        menuExit.triggered.connect(self._exit)
+        menuExit.triggered.connect(lambda: self._exit(True))
         menuExitEx = fileMenu.addAction(u'退出并取消本次所有改动')
+        menuExitEx.triggered.connect(lambda: self._exit(False))
+
         dataMenu = self.menuBar().addMenu(u'数据')
-        dataMenu.addAction('导出...')
+        subMenu = dataMenu.addAction(u'导出...')
+        subMenu.triggered.connect(self._export)
         aboutMenu = self.menuBar().addMenu(u'关于')
 
-    def _exit(self):
-        self.setStatusMsg(u"正在保存数据......");
-        self.saveAndFlushData()
+    def _initListData(self, fileName = './data.json'):
+        self._currentFile = fileName
+        model = createDataModel(fileName)
+        self.ui.listData.setModel(model)
+        self.ui.listData.selectionModel().selectionChanged.connect(self._selectionChanged)
+        self.setStatusMsg(u'文件 [%s] 已经加载'%fileName)
+        self._flushDisplay()
+
+    def _selectFile(self):
+        '''select file from history'''
+        chooser = QFileDialog(self, u"选择一个文件", "history", "*.json")
+        chooser.setModal(True)
+        if chooser.exec_():
+            self._initListData(chooser.selectedFiles()[0])
+
+    def _exit(self, saveData = True):
+        if saveData:
+            self.setStatusMsg(u"正在保存数据......");
+            self.saveAndFlushData()
         self.close()
+        self.saveData = saveData
+
+    def _export(self):
+        chooser = QFileDialog(self, u"输入文件名", u'数据')
+        chooser.setModal(True)
+        if chooser.exec_():
+            fpath = unicode(chooser.selectedFiles()[0])
+            if not fpath.endswith(u'csv'):
+                fpath += u'.csv'
+            fout = codecs.getwriter('utf-8')(open(fpath, "w"))
+            self.ui.listData.model().dumpData(fout)
+
 
     def _initData(self):
-        '''Initialize the data'''
+        '''Initialize the data during startup'''
         self.ui.modeSelector.addItems(self.modes)     
         self._infoTxt = u'';
         self.ui.btnModify.setDisabled(True)
         self.ui.btnDel.setDisabled(True)
+        self._initListData()
+        self._hasDataChanges = False
 
     def _bindSignals(self):
-        #self.ui.listData.clicked.connect(self._showCurrentPicture)
         self.ui.btnAdd.clicked.connect(self._addRecord)
         self.ui.btnModify.clicked.connect(self._modifyRecord)
         self.ui.btnDel.clicked.connect(self._delRecords)
         self.ui.listData.doubleClicked.connect(self._modifyRecord)
         self.ui.modeSelector.currentIndexChanged.connect(self._updateSummaryInfo)
 
-    def _setInitialShow(self):
+    def _flushDisplay(self):
         ''' Set initial data show and styles'''
-        model = createDataModel()
-        self.ui.listData.setModel(model)
-        self.ui.listData.selectionModel().selectionChanged.connect(self._selectionChanged)
         self.ui.pictureShow.setText(u'请选择一列以显示图片')
-
         self.statusBar().setStyleSheet('background:#33FF99')
-        if model.rowCount(None) > 0:
+        if self.ui.listData.model().rowCount(None) > 0:
             self.setStatusMsg(u'选择一行或多行修改/删除数据')
             self._updateSummaryInfo()
         else:
-            self.setStatusMsg(u'还没有数据，请点击增加新记录添加数据')
+            self.setStatusMsg(u'当前文件[%s]还没有数据，请点击增加新记录添加数据'%self._currentFile)
 
-    def saveAndFlushData(self):
+    def saveAndFlushData(self, fname = 'data.json'):
         ''' Save and flush the list data '''
-        self.ui.listData.model().saveData()
+        #print "Saving data into file %s"%fname
+        if self._hasDataChanges:
+            self.ui.listData.model().saveData(fname)
+        else:
+            print "Nothing to update!"
 
     def _modifyRecord(self):
         dlg = EditDlg(self, 'modify')
-        ret = dlg.exec_()
+        dlg.exec_()
+        if dlg.hasUpdates:
+            self._hasDataChanges = True
 
     def _addRecord(self):
         dlg = EditDlg(self, 'add')
-        ret = dlg.exec_()
+        dlg.exec_()
+        if dlg.hasUpdates:
+            self._hasDataChanges = True
 
     def _delRecords(self):
         data = self.ui.listData
         rows = [selected.row() for selected in data.selectionModel().selectedRows()]
         result = [str(row) for row in rows if data.model().removeRow(row)]
         self.setStatusMsg(u"成功删除了%d行数据，行号:%s"%(len(result), ','.join(result)), 2000)
+        self._hasDataChanges = True
         self._updateSummaryInfo()
-            
+
 
     def _selectionChanged(self, selected, deselected):
         getRow = lambda sel : len(sel.indexes()) != 0 and sel.indexes()[0].row or (-1)
@@ -146,7 +190,6 @@ class MainApp(QMainWindow):
         if actions[curMode]():
             self.ui.summaryInfo.setText(self._infoTxt)
 
-
     def _showOverall(self):
         self._infoTxt = u'进货信息合计\n'
         statsIn = self.ui.listData.model().getStatistic(cat = CATEGORY_IN)
@@ -179,6 +222,8 @@ class MainApp(QMainWindow):
         ''' set status hints'''
         self.statusBar().showMessage(msg, timeout)
 
+    def isViewingHistoryFile(self):
+        return self._currentFile.startswith('history')
 
 def getSummaryFromStats(stats):
     result = u''
@@ -193,6 +238,7 @@ if __name__ == "__main__":
     myapp = MainApp()
     myapp.show()
     ret = app.exec_()
-    #myapp.saveAndFlushData()
+    if not hasattr(myapp, 'saveData') and not myapp.isViewingHistoryFile():
+        print "save data implicitly..."
+        myapp.saveAndFlushData()
     sys.exit(ret)
-
