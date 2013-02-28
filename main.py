@@ -25,13 +25,19 @@ class MainApp(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
+        self._initDirectories()
         self._initMenu()
         self._initData()
         self._bindSignals()
 
+    def _initDirectories(self):
+        for dir in [u'图片库', u'历史数据', u'数据']:
+            if not os.access(dir, os.F_OK):
+                os.mkdir(dir)
+
     def _initMenu(self):
         fileMenu = self.menuBar().addMenu(u'文件')
-        for fileName in  sorted([('history' + os.path.sep + fname) for fname in os.listdir('history') \
+        for fileName in  sorted([(u'历史数据' + os.path.sep + fname) for fname in os.listdir(u'历史数据') \
                     if fname.startswith('data.') and fname.endswith('.json') \
                 ], reverse = True)[:10]:
             subMenu = fileMenu.addAction(unicode(fileName))
@@ -226,7 +232,7 @@ class MainApp(QMainWindow):
         self.statusBar().showMessage(msg, timeout)
 
     def isViewingHistoryFile(self):
-        return self._currentFile.startswith('history')
+        return self._currentFile.startswith(u'历史数据')
 
 def getAbsStats(statsIn, statsOut):
     stats = {}

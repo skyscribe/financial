@@ -140,7 +140,7 @@ class DetailedDataModel(QAbstractTableModel):
         from datetime import datetime
         timestamp = str(datetime.now()).replace('-', '').replace(' ', '-').replace(':', '')
         cacheFileName = self.DEFAULT_DATA_FILE.replace('.', '.%s.'%timestamp)
-        copyfile(fname, os.path.sep.join(['history', cacheFileName]))
+        copyfile(fname, os.path.sep.join([u'历史数据', cacheFileName]))
 
     def getNewUnusedId(self):
         '''choose an unique unused id, for adding'''

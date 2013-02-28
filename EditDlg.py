@@ -113,7 +113,7 @@ class EditDlg(QDialog):
         chooser.setModal(True)
         if chooser.exec_():
             file_choosed = unicode(chooser.selectedFiles()[0])
-            fpath = unicode(os.path.sep).join([u"pictures", file_choosed.split(os.path.sep)[-1] ])
+            fpath = unicode(os.path.sep).join([u'图片库', file_choosed.split(os.path.sep)[-1] ])
             if not os.access(fpath, os.F_OK):
                 with open(fpath, 'wb') as ofh:
                     with open(file_choosed, 'rb') as ifh:
