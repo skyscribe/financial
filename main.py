@@ -191,13 +191,14 @@ class MainApp(QMainWindow):
             self.ui.summaryInfo.setText(self._infoTxt)
 
     def _showOverall(self):
-        self._infoTxt = u'进货信息合计\n'
+        infoTxt = u''
+        delimiter = u'\n#####################\n\n'
         statsIn = self.ui.listData.model().getStatistic(cat = CATEGORY_IN)
-        self._infoTxt += getSummaryFromStats(statsIn)
-        self._infoTxt += u'\n#####################\n\n'
-        self._infoTxt += u'出货信息合计\n'
         statsOut = self.ui.listData.model().getStatistic(cat = CATEGORY_OUT)
-        self._infoTxt += getSummaryFromStats(statsOut)
+        infoTxt += getSummaryText(u'进货信息合计\n', statsIn, delimiter)
+        infoTxt += getSummaryText(u'出货信息合计\n', statsOut, delimiter)
+        infoTxt += getSummaryText(u'净资金分类信息\n', getAbsStats(statsIn, statsOut), u'')
+        self._infoTxt = infoTxt
         return True
 
     def _showPersonal(self):
@@ -209,13 +210,15 @@ class MainApp(QMainWindow):
             return False
         else:
             model = data.model()
-            self._infoTxt = u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]), u'出货')
-            stats = data.model().getStatistic(rows[0], CATEGORY_OUT)
-            self._infoTxt += getSummaryFromStats(stats)
-            self._infoTxt += u'\n#####################\n\n'
-            self._infoTxt += u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]), u'进货')
-            stats = data.model().getStatistic(rows[0], CATEGORY_IN)
-            self._infoTxt += getSummaryFromStats(stats)
+            txt = u''
+            statsOut = data.model().getStatistic(rows[0], CATEGORY_OUT)
+            statsIn = data.model().getStatistic(rows[0], CATEGORY_IN)
+            txt += getSummaryText(u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]), u'出货'),
+                    statsOut, u'\n#####################\n\n') 
+            txt += getSummaryText(u'个人信息统计 [%s - %s]\n'%(model.getName(rows[0]), u'进货'),
+                    statsOut, u'\n#####################\n\n')
+            txt += getSummaryText(u'净资金分类信息\n', getAbsStats(statsIn, statsOut), u'')
+            self._infoTxt = txt
             return True
 
     def setStatusMsg(self, msg, timeout = 0):
@@ -225,10 +228,25 @@ class MainApp(QMainWindow):
     def isViewingHistoryFile(self):
         return self._currentFile.startswith('history')
 
+def getAbsStats(statsIn, statsOut):
+    stats = {}
+    types = statsIn.keys()
+    types.extend(statsOut.keys())
+    for k in types:
+        stats[k] = 0
+        if statsOut.has_key(k):
+            stats[k] += statsOut[k]
+        if statsIn.has_key(k):
+            stats[k] -= statsIn[k]
+    return stats
+
+def getSummaryText(prefix, stats, suffix):
+    return prefix + getSummaryFromStats(stats) + suffix
+
 def getSummaryFromStats(stats):
     result = u''
-    for (k,v) in stats.items():
-        result += u'\t%6s => %8d\n'%(k,v)
+    for k in sorted(stats.keys()):
+        result += u'\t%6s => %8d\n'%(k, stats[k])
     result += u'\t---------------------------------\n'
     result += u'\t%6s => %8d\n'%(u'总计', sum([stat for stat in stats.values()]))
     return result

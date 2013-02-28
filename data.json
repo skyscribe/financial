@@ -48,18 +48,6 @@
         }
     }, 
     {
-        "id": "5", 
-        "contents": {
-            "category": "\u8fdb\u8d27", 
-            "name": "\u963f\u65af", 
-            "price": "121", 
-            "pic": "pictures/image5.jpg", 
-            "comments": "", 
-            "date": "2013-02-23 17 : 51 : 51", 
-            "type": "A\u7c7b"
-        }
-    }, 
-    {
         "id": "6", 
         "contents": {
             "category": "\u8fdb\u8d27", 
@@ -122,13 +110,25 @@
     {
         "id": "11", 
         "contents": {
-            "category": "\u8fdb\u8d27", 
+            "category": "\u51fa\u8d27", 
             "name": "\u963f\u65af", 
             "price": "121", 
             "pic": "pictures/image5.jpg", 
             "comments": "", 
-            "date": "2013-02-23 17 : 52 : 16", 
+            "date": "2013-02-23 21 : 23 : 15", 
             "type": "C\u7c7b"
+        }
+    }, 
+    {
+        "id": "5", 
+        "contents": {
+            "category": "\u8fdb\u8d27", 
+            "name": "\u674e\u56db", 
+            "price": "121", 
+            "pic": "pictures/image1.jpg", 
+            "comments": "", 
+            "date": "2013-02-25 22 : 09 : 03", 
+            "type": "A\u7c7b"
         }
     }
 ]
